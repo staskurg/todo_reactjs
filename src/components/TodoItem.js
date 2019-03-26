@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import { string, bool } from "prop-types";
 
 const ShowItem = props => (
@@ -8,7 +8,7 @@ const ShowItem = props => (
     </div>
     <div className="btn__group">
       {!props.completed && (
-        <button className="btn btn_edit">
+        <button className="btn btn_edit" onClick={props.toggle}>
           <i className="fas fa-edit" />
         </button>
       )}
@@ -19,11 +19,11 @@ const ShowItem = props => (
   </div>
 );
 
-const EditItem = () => (
+const EditItem = props => (
   <div className="item__edit">
     <form id="edit-form">
       <div className="edit-input">
-        <input v-model="newValue" type="text" className="todo-input" />
+        <input value={props.title} type="text" className="todo-input" />
       </div>
       <div className="btn__group">
         <button className="btn btn_save" type="submit">
@@ -37,22 +37,40 @@ const EditItem = () => (
   </div>
 );
 
-const TodoItem = props => {
-  let isEditing = false;
-  let itemClass = "item";
-  if (props.completed) {
-    itemClass += " item_is-completed";
+class TodoItem extends Component {
+  constructor(props) {
+    super(props);
+    this.toggleForm = this.toggleForm.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = { isEditing: false, newValue: "" };
   }
-  return (
-    <div className={itemClass}>
-      {isEditing ? (
-        <EditItem />
-      ) : (
-        <ShowItem title={props.title} completed={props.completed} />
-      )}
-    </div>
-  );
-};
+  toggleForm() {
+    if (!this.state.isEditing) {
+      // this.setState({ newValue: this.props.title });
+      this.setState({ isEditing: true });
+    } else this.setState({ isEditing: false });
+  }
+
+  render() {
+    let itemClass = "item";
+    if (this.props.completed) {
+      itemClass += " item_is-completed";
+    }
+    return (
+      <div className={itemClass}>
+        {this.state.isEditing ? (
+          <EditItem title={this.props.title} />
+        ) : (
+          <ShowItem
+            title={this.props.title}
+            completed={this.props.completed}
+            toggle={this.toggleForm}
+          />
+        )}
+      </div>
+    );
+  }
+}
 
 ShowItem.propTypes = {
   title: string.isRequired,
