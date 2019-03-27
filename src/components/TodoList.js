@@ -31,6 +31,9 @@ class TodoList extends Component {
       ]
     };
     this.add = this.add.bind(this);
+    this.save = this.save.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
+    this.complete = this.complete.bind(this);
     this.getRandom = this.getRandom.bind(this);
   }
 
@@ -47,16 +50,44 @@ class TodoList extends Component {
     });
   }
 
-  deleteItem(i) {
-    this.list.splice(i, 1);
+  deleteItem(id) {
+    this.setState(state => {
+      const index = state.list.findIndex(item => {
+        return item.id === id;
+      });
+      state.list.splice(index, 1);
+      return {
+        list: state.list
+      };
+    });
   }
 
-  complete(item) {
-    item.completed = !item.completed;
+  complete(id) {
+    this.setState(state => {
+      const newList = state.list.map(item => {
+        if (item.id === id) {
+          item.completed = !item.completed;
+        }
+        return item;
+      });
+      return {
+        list: newList
+      };
+    });
   }
 
-  save(item, val) {
-    item.title = val;
+  save(val) {
+    this.setState(state => {
+      const newList = state.list.map(item => {
+        if (item.id === val.id) {
+          item.title = val.title;
+        }
+        return item;
+      });
+      return {
+        list: newList
+      };
+    });
   }
 
   getRandom(min, max) {
@@ -66,20 +97,37 @@ class TodoList extends Component {
   }
 
   render() {
-    return (
-      <div className="todo-list">
-        <h1>Todo App</h1>
-        <h3>Currently 5 todo items in the list</h3>
-        <TodoAddItem addNewItem={this.add} />
+    const Counter = () =>
+      this.state.list.length > 0 && (
+        <h3>
+          Currently {this.state.list.length} todo{" "}
+          {this.state.list.length === 1 ? "item" : "items"} in the list
+        </h3>
+      );
+
+    const Tasks = () => (
+      <div className="item-group">
         {this.state.list.map(item => {
           return (
             <TodoItem
               title={item.title}
               completed={item.completed}
+              id={item.id}
               key={item.id}
+              saveChanges={this.save}
+              delete={this.deleteItem}
+              complete={this.complete}
             />
           );
         })}
+      </div>
+    );
+    return (
+      <div className="todo-list">
+        <h1>Todo App</h1>
+        <Counter />
+        <TodoAddItem addNewItem={this.add} />
+        <Tasks />
       </div>
     );
   }

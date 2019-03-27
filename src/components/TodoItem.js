@@ -1,54 +1,19 @@
 import React, { Component } from "react";
 import { string, bool } from "prop-types";
 
-const ShowItem = props => (
-  <div className="item__show">
-    <div className="btn_complete">
-      <h3>{props.title}</h3>
-    </div>
-    <div className="btn__group">
-      {!props.completed && (
-        <button className="btn btn_edit" onClick={props.toggle}>
-          <i className="fas fa-edit" />
-        </button>
-      )}
-      <button className="btn btn_delete">
-        <i className="fas fa-trash-alt" />
-      </button>
-    </div>
-  </div>
-);
-
-const EditItem = props => (
-  <div className="item__edit">
-    <form id="edit-form">
-      <div className="edit-input">
-        <input value={props.title} type="text" className="todo-input" />
-      </div>
-      <div className="btn__group">
-        <button className="btn btn_save" type="submit">
-          <i className="fas fa-check" />
-        </button>
-        <button className="btn btn_cancel">
-          <i className="fas fa-times" />
-        </button>
-      </div>
-    </form>
-  </div>
-);
+import EditItem from "./TodoEditItem";
+import ShowItem from "./TodoShowItem";
 
 class TodoItem extends Component {
   constructor(props) {
     super(props);
     this.toggleForm = this.toggleForm.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
     this.state = { isEditing: false, newValue: "" };
   }
   toggleForm() {
-    if (!this.state.isEditing) {
-      // this.setState({ newValue: this.props.title });
-      this.setState({ isEditing: true });
-    } else this.setState({ isEditing: false });
+    this.state.isEditing
+      ? this.setState({ isEditing: false })
+      : this.setState({ isEditing: true });
   }
 
   render() {
@@ -59,12 +24,20 @@ class TodoItem extends Component {
     return (
       <div className={itemClass}>
         {this.state.isEditing ? (
-          <EditItem title={this.props.title} />
+          <EditItem
+            title={this.props.title}
+            id={this.props.id}
+            toggle={this.toggleForm}
+            editItem={this.props.saveChanges}
+          />
         ) : (
           <ShowItem
             title={this.props.title}
+            id={this.props.id}
             completed={this.props.completed}
             toggle={this.toggleForm}
+            delete={this.props.delete}
+            complete={this.props.complete}
           />
         )}
       </div>
@@ -74,7 +47,8 @@ class TodoItem extends Component {
 
 ShowItem.propTypes = {
   title: string.isRequired,
-  completed: bool.isRequired
+  completed: bool.isRequired,
+  id: string.isRequired
 };
 
 export default TodoItem;
